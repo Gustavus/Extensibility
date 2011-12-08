@@ -22,13 +22,13 @@ abstract class Extensibility
    *
    * @var string
    */
-  protected static $currentTag  = NULL;
+  protected static $currentTag = null;
 
   /**
    *
    * @var boolean
    */
-  private static $stop      = FALSE;
+  private static $stop = false;
 
   /**
    * @param string $tag
@@ -53,19 +53,16 @@ abstract class Extensibility
    */
   final static public function remove($tag, $function, $priority = 10, $acceptedArguments = 1)
   {
-    if (isset(self::$items[$tag][$priority]))
-    {
-      foreach(self::$items[$tag][$priority] as $key => $item)
-      {
-        if ($item == array('function' => $function, 'acceptedArguments' => $acceptedArguments))
-        {
+    if (isset(self::$items[$tag][$priority])) {
+      foreach (self::$items[$tag][$priority] as $key => $item) {
+        if ($item == array('function' => $function, 'acceptedArguments' => $acceptedArguments)) {
           unset(self::$items[$tag][$priority][$key]);
-          return TRUE;
+          return true;
         }
       }
     }
 
-    return FALSE;
+    return false;
   }
 
   /**
@@ -74,9 +71,9 @@ abstract class Extensibility
    * @param mixed $return Value to return
    * @return void
    */
-  final static public function stop($return = NULL)
+  final static public function stop($return = null)
   {
-    self::$stop = TRUE;
+    self::$stop = true;
   }
 
   /**
@@ -84,10 +81,11 @@ abstract class Extensibility
    */
   final static protected function isStopRequested()
   {
-    if (self::$stop === TRUE)
-      return TRUE;
-    else
-      return FALSE;
+    if (self::$stop === true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -95,8 +93,8 @@ abstract class Extensibility
    */
   final static protected function doStop()
   {
-    self::$stop     = FALSE;
-    self::$currentTag = NULL;
+    self::$stop     = false;
+    self::$currentTag = null;
   }
 
   /**
@@ -117,14 +115,13 @@ abstract class Extensibility
     return call_user_func_array($callback, $arguments);
 
     // Using the reflection class seems to be slower than using call_user_func_array()
-    if (is_array($callback)) // Function is in a class
-    {
+    if (is_array($callback)) {
+      // Function is in a class
       $ref    = new \ReflectionClass(get_class($callback[0]));
       $method   = $ref->getMethod($callback[1]);
       return $method->invokeArgs($callback[0], $arguments);
-    }
-    else // Function is not in a class
-    {
+    } else {
+      // Function is not in a class
       $method   = new \ReflectionFunction($callback);
       return $method->invokeArgs($arguments);
     }

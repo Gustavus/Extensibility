@@ -22,33 +22,25 @@ class Actions extends Extensibility
   {
     self::startApply($tag);
 
-    $result = NULL;
+    $result = null;
 
-    if (isset(self::$items[$tag]))
-    {
+    if (isset(self::$items[$tag])) {
       self::prioritize($tag);
-      foreach(self::$items[$tag] as $priority)
-      {
-        foreach($priority as $item)
-        {
-          if (is_callable($item['function']))
-          {
+      foreach (self::$items[$tag] as $priority) {
+        foreach ($priority as $item) {
+          if (is_callable($item['function'])) {
             $arguments  = func_get_args();
             $arguments  = array_slice($arguments, 1);
 
-            if ($item['acceptedArguments'] == 0)
-            {
-              $arguments  = NULL;
-            }
-            else if ($item['acceptedArguments'] < count($arguments))
-            {
+            if ($item['acceptedArguments'] == 0) {
+              $arguments  = null;
+            } else if ($item['acceptedArguments'] < count($arguments)) {
               $arguments  = array_slice($arguments, 0, $item['acceptedArguments']);
             }
 
             $result = self::execute($item['function'], $arguments);
 
-            if (self::isStopRequested())
-            {
+            if (self::isStopRequested()) {
               return self::endApply();
             }
           }
@@ -77,4 +69,3 @@ class Actions extends Extensibility
     return self::doStop();
   }
 }
-?>
