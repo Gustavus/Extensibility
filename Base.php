@@ -101,10 +101,9 @@ abstract class Base
   /**
    * Stops the rest of the filters and actions in the current tag from being run
    *
-   * @param mixed $return Value to return
    * @return void
    */
-  final static public function stop($return = null)
+  final static public function stop()
   {
     self::$stop = true;
   }
