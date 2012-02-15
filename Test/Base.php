@@ -72,4 +72,14 @@ abstract class Base extends \Gustavus\Test\Test
     $this->testingVar = 'STOP FAILED';
     $this->noArgumentsCallback();
   }
+
+  /**
+   * @test
+   */
+  public function afterStopRequestedCallbackTest()
+  {
+    $this->afterStopRequestedCallback();
+    $this->assertSame(1, $this->called);
+    $this->assertSame('STOP FAILED', $this->testingVar);
+  }
 }
