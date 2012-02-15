@@ -113,11 +113,7 @@ abstract class Base
    */
   final static protected function isStopRequested()
   {
-    if (self::$stop === true) {
-      return true;
-    } else {
-      return false;
-    }
+    return self::$stop;
   }
 
   /**
