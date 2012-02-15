@@ -1,7 +1,6 @@
 <?php
 /**
- * @package General
- * @subpackage Extensibility
+ * @package Extensibility
  */
 
 namespace Gustavus\Extensibility;
@@ -10,8 +9,7 @@ require_once __DIR__ . '/Base.php';
 /**
  * Runs actions
  *
- * @package General
- * @subpackage Extensibility
+ * @package Extensibility
  */
 class Actions extends Base
 {

@@ -1,7 +1,6 @@
 <?php
 /**
- * @package General
- * @subpackage Extensibility
+ * @package Extensibility
  */
 
 namespace Gustavus\Extensibility;
@@ -9,8 +8,7 @@ namespace Gustavus\Extensibility;
 /**
  * Base class for filters and actions
  *
- * @package General
- * @subpackage Extensibility
+ * @package Extensibility
  */
 abstract class Base
 {
