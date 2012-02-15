@@ -33,14 +33,20 @@ abstract class Base
   private static $stop = false;
 
   /**
+   * Adds a callback to the given tag
+   *
    * @param string $tag
    * @param callback $function
    * @param integer $priority
    * @param integer $acceptedArguments
    * @return boolean
    */
-  final static public function add($tag, $function, $priority = 10, $acceptedArguments = 1)
+  final static public function add($tag, $function, $priority = 10, $acceptedArguments = null)
   {
+    if ($acceptedArguments === null) {
+      $acceptedArguments = self::getNumberOfArguments($function);
+    }
+
     // Remove it if it exists, so it doesn't get added twice
     self::remove($tag, $function, $priority, $acceptedArguments);
 
@@ -51,14 +57,35 @@ abstract class Base
   }
 
   /**
+   * Gets the number of arguments the given function can accept (arity).
+   *
+   * @param callback $function
+   * @return integer
+   */
+  final static private function getNumberOfArguments($function)
+  {
+    if (is_array($function)) {
+      $method = new \ReflectionMethod($function[0], $function[1]);
+    } else if (is_string($function)) {
+      $method = new \ReflectionFunction($function);
+    }
+
+    return $method->getNumberOfParameters();
+  }
+
+  /**
    * @param string $tag
    * @param callback $function
    * @param integer $priority
    * @param integer $acceptedArguments
    * @return boolean
    */
-  final static public function remove($tag, $function, $priority = 10, $acceptedArguments = 1)
+  final static public function remove($tag, $function, $priority = 10, $acceptedArguments = null)
   {
+    if ($acceptedArguments === null) {
+      $acceptedArguments = self::getNumberOfArguments($function);
+    }
+
     if (isset(self::$items[$tag][$priority])) {
       foreach (self::$items[$tag][$priority] as $key => $item) {
         if ($item == array('function' => $function, 'acceptedArguments' => $acceptedArguments)) {
