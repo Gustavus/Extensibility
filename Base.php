@@ -13,7 +13,7 @@ namespace Gustavus\Extensibility;
 abstract class Base
 {
   /**
-   *
+   * Callbacks organized by tag > priority > order added
    * @var array
    */
   protected static $items = array();
@@ -72,6 +72,8 @@ abstract class Base
   }
 
   /**
+   * Removes a callback from the tag
+   *
    * @param string $tag
    * @param callback $function
    * @param integer $priority
