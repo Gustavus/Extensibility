@@ -34,7 +34,7 @@ class Actions extends Base
             $arguments  = array_slice($arguments, 1);
 
             if ($item['acceptedArguments'] == 0) {
-              $arguments  = null;
+              $arguments  = array();
             } else if ($item['acceptedArguments'] < count($arguments)) {
               $arguments  = array_slice($arguments, 0, $item['acceptedArguments']);
             }

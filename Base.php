@@ -147,7 +147,7 @@ abstract class Base
    * @param mixed $callback
    * @param array $arguments
    */
-  final static protected function execute($callback, array $arguments)
+  final static protected function execute($callback, array $arguments = array())
   {
     return call_user_func_array($callback, $arguments);
 

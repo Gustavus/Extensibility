@@ -33,7 +33,7 @@ class Filters extends Base
             $arguments  = array_merge(array($content), array_slice($arguments, 2));
 
             if ($item['acceptedArguments'] == 0) {
-              $arguments  = null;
+              $arguments  = array();
             } else if ($item['acceptedArguments'] < count($arguments)) {
               $arguments  = array_slice($arguments, 0, $item['acceptedArguments']);
             }
