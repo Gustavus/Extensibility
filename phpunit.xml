@@ -5,6 +5,12 @@
     </testsuite>
   </testsuites>
 
+  <filter>
+    <whitelist>
+      <directory>/cis/lib/Gustavus/Extensibility</directory>
+    </whitelist>
+  </filter>
+
   <php>
     <ini name="memory_limit" value="-1"/>
     <ini name="xdebug.collect_params" value="0"/>
