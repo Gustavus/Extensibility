@@ -6,34 +6,20 @@
 
 namespace Gustavus\Extensibility\Test;
 
-use Gustavus\Extensibility\Base;
-
-require_once 'Gustavus/Test/Test.php';
-require_once 'Gustavus/Extensibility/Base.php';
+require_once __DIR__ . '/Base.php';
 
 /**
  * @package Extensibility
  * @subpackage Test
  */
-class BaseTest extends \Gustavus\Test\Test
+class BaseTest extends Base
 {
-
-  /**
-   * @return void
-   */
-  public function setUp()
-  {
-    $this->set('\Gustavus\Extensibility\Base', 'items', array());
-    $this->set('\Gustavus\Extensibility\Base', 'currentTag', null);
-    $this->set('\Gustavus\Extensibility\Base', 'stop', false);
-  }
-
   /**
    * @test
    */
   public function addAndRemove()
   {
-    Base::add('TestTag', 'is_int');
+    \Gustavus\Extensibility\Base::add('TestTag', 'is_int');
 
     $expected = array(
       'TestTag' => array(
@@ -48,7 +34,7 @@ class BaseTest extends \Gustavus\Test\Test
 
     $this->assertSame($expected, $this->get('\Gustavus\Extensibility\Base', 'items'));
 
-    Base::add('TestTag', 'is_int');
+    \Gustavus\Extensibility\Base::add('TestTag', 'is_int');
 
     $expected = array(
       'TestTag' => array(
@@ -63,7 +49,7 @@ class BaseTest extends \Gustavus\Test\Test
 
     $this->assertSame($expected, $this->get('\Gustavus\Extensibility\Base', 'items'));
 
-    Base::add('TestTag', 'is_string');
+    \Gustavus\Extensibility\Base::add('TestTag', 'is_string');
 
     $expected = array(
       'TestTag' => array(
@@ -82,7 +68,7 @@ class BaseTest extends \Gustavus\Test\Test
 
     $this->assertSame($expected, $this->get('\Gustavus\Extensibility\Base', 'items'));
 
-    Base::add('TestTag', 'is_object', 100);
+    \Gustavus\Extensibility\Base::add('TestTag', 'is_object', 100);
 
     $expected = array(
       'TestTag' => array(
@@ -107,7 +93,7 @@ class BaseTest extends \Gustavus\Test\Test
 
     $this->assertSame($expected, $this->get('\Gustavus\Extensibility\Base', 'items'));
 
-    Base::add('SecondTestTag', 'is_array');
+    \Gustavus\Extensibility\Base::add('SecondTestTag', 'is_array');
 
     $expected = array(
       'TestTag' => array(
@@ -140,7 +126,7 @@ class BaseTest extends \Gustavus\Test\Test
 
     $this->assertSame($expected, $this->get('\Gustavus\Extensibility\Base', 'items'));
 
-    Base::remove('TestTag', 'is_int');
+    \Gustavus\Extensibility\Base::remove('TestTag', 'is_int');
 
     $expected = array(
       'TestTag' => array(
@@ -188,7 +174,7 @@ class BaseTest extends \Gustavus\Test\Test
     $this->assertFalse($this->get('\Gustavus\Extensibility\Base', 'stop'));
     $this->assertFalse($this->call('\Gustavus\Extensibility\Base', 'isStopRequested'));
 
-    Base::stop();
+    \Gustavus\Extensibility\Base::stop();
 
     $this->assertTrue($this->get('\Gustavus\Extensibility\Base', 'stop'));
     $this->assertTrue($this->call('\Gustavus\Extensibility\Base', 'isStopRequested'));
