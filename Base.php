@@ -135,6 +135,15 @@ abstract class Base
   }
 
   /**
+   * @param string $tag
+   * @return void
+   */
+  final static protected function startApply($tag)
+  {
+    self::$currentTag = $tag;
+  }
+
+  /**
    * @param mixed $callback
    * @param array $arguments
    */

@@ -242,6 +242,18 @@ class BaseTest extends \Gustavus\Test\Test
   /**
    * @test
    */
+  public function startApply()
+  {
+    $this->assertNULL($this->get('\Gustavus\Extensibility\Base', 'currentTag'));
+
+    $this->call('\Gustavus\Extensibility\Base', 'startApply', array('TestTag'));
+
+    $this->assertSame('TestTag', $this->get('\Gustavus\Extensibility\Base', 'currentTag'));
+  }
+
+  /**
+   * @test
+   */
   public function execute()
   {
     $this->assertTrue($this->call('\Gustavus\Extensibility\Base', 'execute', array('is_int', array(1))));

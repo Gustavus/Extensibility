@@ -52,15 +52,6 @@ class Filters extends Base
   }
 
   /**
-   * @param string $tag
-   * @return void
-   */
-  final static private function startApply($tag)
-  {
-    self::$currentTag = $tag;
-  }
-
-  /**
    * @param mixed $content
    * @return mixed
    */
