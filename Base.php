@@ -4,13 +4,15 @@
  * @subpackage Extensibility
  */
 
+namespace Gustavus\Extensibility;
+
 /**
  * Base class for filters and actions
  *
  * @package General
  * @subpackage Extensibility
  */
-abstract class Extensibility
+abstract class Base
 {
   /**
    *
