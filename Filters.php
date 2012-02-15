@@ -4,7 +4,8 @@
  * @subpackage Extensibility
  */
 
-require_once 'base.class.php';
+namespace Gustavus\Extensibility;
+require_once __DIR__ . '/Base.php';
 
 /**
  * Runs actions
@@ -12,17 +13,16 @@ require_once 'base.class.php';
  * @package General
  * @subpackage Extensibility
  */
-class Actions extends Extensibility
+class Filters extends Base
 {
   /**
    * @param string $tag
-   * @return void
+   * @param mixed $content
+   * @return mixed
    */
-  final static public function apply($tag)
+  final static public function apply($tag, $content)
   {
     self::startApply($tag);
-
-    $result = null;
 
     if (isset(self::$items[$tag])) {
       self::prioritize($tag);
@@ -30,7 +30,7 @@ class Actions extends Extensibility
         foreach ($priority as $item) {
           if (is_callable($item['function'])) {
             $arguments  = func_get_args();
-            $arguments  = array_slice($arguments, 1);
+            $arguments  = array_merge(array($content), array_slice($arguments, 2));
 
             if ($item['acceptedArguments'] == 0) {
               $arguments  = null;
@@ -38,17 +38,17 @@ class Actions extends Extensibility
               $arguments  = array_slice($arguments, 0, $item['acceptedArguments']);
             }
 
-            $result = self::execute($item['function'], $arguments);
+            $content  = self::execute($item['function'], $arguments);
 
             if (self::isStopRequested()) {
-              return self::endApply();
+              return self::endApply($content);
             }
           }
         }
       }
     }
 
-    return self::endApply();
+    return self::endApply($content);
   }
 
   /**
@@ -61,11 +61,12 @@ class Actions extends Extensibility
   }
 
   /**
-   * @param string $string
-   * @return void
+   * @param mixed $content
+   * @return mixed
    */
-  final static private function endApply()
+  final static private function endApply($content)
   {
-    return self::doStop();
+    self::doStop();
+    return $content;
   }
 }
