@@ -17,21 +17,6 @@ require_once 'Gustavus/Extensibility/Actions.php';
  */
 class ActionsTest extends Base
 {
-  private $called = 0;
-
-  private $testingVar = null;
-
-  /**
-   * @return void
-   */
-  public function setUp()
-  {
-    $this->called = 0;
-    $this->testingVar = null;
-
-    parent::setUp();
-  }
-
   /**
    * @test
    */
@@ -50,41 +35,6 @@ class ActionsTest extends Base
     Actions::apply('TestTag', 'test', 'test2');
     $this->assertSame(4, $this->called);
     $this->assertSame('test', $this->testingVar);
-  }
-
-  /**
-   * Callback for the apply test
-   */
-  public function noArgumentsCallback()
-  {
-    ++$this->called;
-  }
-
-  /**
-   * Callback for the apply test
-   */
-  public function oneArgumentCallback($var)
-  {
-    $this->testingVar = $var;
-    $this->noArgumentsCallback();
-  }
-
-  /**
-   * Callback for the apply test
-   */
-  public function stopRequestedCallback()
-  {
-    Actions::stop();
-    $this->noArgumentsCallback();
-  }
-
-  /**
-   * Callback for the apply test
-   */
-  public function afterStopRequestedCallback()
-  {
-    $this->testingVar = 'STOP FAILED';
-    $this->noArgumentsCallback();
   }
 
   /**
