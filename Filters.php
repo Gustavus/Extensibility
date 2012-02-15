@@ -16,6 +16,8 @@ require_once __DIR__ . '/Base.php';
 class Filters extends Base
 {
   /**
+   * Calls all of the callback functions added to the given tag and sets $content to the result
+   *
    * @param string $tag
    * @param mixed $content
    * @return mixed

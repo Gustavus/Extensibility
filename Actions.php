@@ -16,6 +16,8 @@ require_once __DIR__ . '/Base.php';
 class Actions extends Base
 {
   /**
+   * Calls all of the callback functions added to the given tag
+   *
    * @param string $tag
    * @return void
    */
