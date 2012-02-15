@@ -43,7 +43,11 @@ abstract class Base
   {
     // Remove it if it exists, so it doesn't get added twice
     self::remove($tag, $function, $priority, $acceptedArguments);
-    self::$items[$tag][$priority][] = array('function' => $function, 'acceptedArguments' => $acceptedArguments);
+
+    self::$items[$tag][$priority][] = array(
+      'function'          => $function,
+      'acceptedArguments' => $acceptedArguments,
+    );
   }
 
   /**
@@ -68,8 +72,8 @@ abstract class Base
   }
 
   /**
-   * Stops the rest of the filters and actions in the current tag from being
-   * run
+   * Stops the rest of the filters and actions in the current tag from being run
+   *
    * @param mixed $return Value to return
    * @return void
    */
@@ -95,7 +99,7 @@ abstract class Base
    */
   final static protected function doStop()
   {
-    self::$stop     = false;
+    self::$stop       = false;
     self::$currentTag = null;
   }
 
