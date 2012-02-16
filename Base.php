@@ -5,6 +5,8 @@
 
 namespace Gustavus\Extensibility;
 
+require_once __DIR__ . '/CallbackFactory.php';
+
 /**
  * Base class for filters and actions
  *
@@ -36,39 +38,22 @@ abstract class Base
    * @param string $tag
    * @param callback $function
    * @param integer $priority
-   * @param integer $acceptedArguments
+   * @param integer $numberOfParameters
    * @return boolean
    */
-  final static public function add($tag, $function, $priority = 10, $acceptedArguments = null)
+  final static public function add($tag, $function, $priority = 10, $numberOfParameters = null)
   {
-    if ($acceptedArguments === null) {
-      $acceptedArguments = self::getNumberOfArguments($function);
+    if (!isset(self::$items[$tag][$priority])) {
+      self::$items[$tag][$priority] = new \SplObjectStorage();
     }
 
-    // Remove it if it exists, so it doesn't get added twice
-    self::remove($tag, $function, $priority, $acceptedArguments);
+    $callback = CallbackFactory::getCallback($function, $numberOfParameters);
 
-    self::$items[$tag][$priority][] = array(
-      'function'          => $function,
-      'acceptedArguments' => $acceptedArguments,
-    );
-  }
-
-  /**
-   * Gets the number of arguments the given function can accept (arity).
-   *
-   * @param callback $function
-   * @return integer
-   */
-  final static private function getNumberOfArguments($function)
-  {
-    if (is_array($function)) {
-      $method = new \ReflectionMethod($function[0], $function[1]);
-    } else if (is_string($function)) {
-      $method = new \ReflectionFunction($function);
+    if (!self::$items[$tag][$priority]->contains($callback)) {
+      self::$items[$tag][$priority]->attach($callback);
     }
 
-    return $method->getNumberOfParameters();
+    return true;
   }
 
   /**
@@ -77,25 +62,38 @@ abstract class Base
    * @param string $tag
    * @param callback $function
    * @param integer $priority
-   * @param integer $acceptedArguments
+   * @param integer $numberOfParameters
    * @return boolean
    */
-  final static public function remove($tag, $function, $priority = 10, $acceptedArguments = null)
+  final static public function remove($tag, $function, $priority = 10, $numberOfParameters = null)
   {
-    if ($acceptedArguments === null) {
-      $acceptedArguments = self::getNumberOfArguments($function);
-    }
-
     if (isset(self::$items[$tag][$priority])) {
-      foreach (self::$items[$tag][$priority] as $key => $item) {
-        if ($item == array('function' => $function, 'acceptedArguments' => $acceptedArguments)) {
-          unset(self::$items[$tag][$priority][$key]);
-          return true;
-        }
+      $callback = CallbackFactory::getCallback($function, $numberOfParameters);
+
+      if (self::$items[$tag][$priority]->contains($callback)) {
+        self::$items[$tag][$priority]->detach($callback);
+        return true;
       }
     }
 
     return false;
+  }
+
+  /**
+   * @param string $tag
+   * @return \RecursiveIteratorIterator
+   */
+  final static protected function getIterator($tag)
+  {
+    if (isset(self::$items[$tag])) {
+      self::prioritize($tag);
+
+      return new \RecursiveIteratorIterator(
+          new \RecursiveArrayIterator(self::$items[$tag]),
+          \RecursiveIteratorIterator::SELF_FIRST,
+          \RecursiveIteratorIterator::CATCH_GET_CHILD
+      );
+    }
   }
 
   /**
@@ -141,26 +139,5 @@ abstract class Base
   final static protected function startApply($tag)
   {
     self::$currentTag = $tag;
-  }
-
-  /**
-   * @param mixed $callback
-   * @param array $arguments
-   */
-  final static protected function execute($callback, array $arguments = array())
-  {
-    return call_user_func_array($callback, $arguments);
-
-    // Using the reflection class seems to be slower than using call_user_func_array()
-    if (is_array($callback)) {
-      // Function is in a class
-      $ref    = new \ReflectionClass(get_class($callback[0]));
-      $method   = $ref->getMethod($callback[1]);
-      return $method->invokeArgs($callback[0], $arguments);
-    } else {
-      // Function is not in a class
-      $method   = new \ReflectionFunction($callback);
-      return $method->invokeArgs($arguments);
-    }
   }
 }

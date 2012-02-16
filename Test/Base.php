@@ -7,6 +7,7 @@
 namespace Gustavus\Extensibility\Test;
 
 require_once 'Gustavus/Test/Test.php';
+require_once 'Gustavus/Extensibility/CallbackFactory.php';
 require_once 'Gustavus/Extensibility/Base.php';
 
 /**
@@ -30,6 +31,8 @@ abstract class Base extends \Gustavus\Test\Test
    */
   public function setUp()
   {
+    $this->set('\Gustavus\Extensibility\CallbackFactory', 'callbackCache', null);
+
     $this->set('\Gustavus\Extensibility\Base', 'items', array());
     $this->set('\Gustavus\Extensibility\Base', 'currentTag', null);
     $this->set('\Gustavus\Extensibility\Base', 'stop', false);

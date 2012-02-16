@@ -7,6 +7,7 @@
 namespace Gustavus\Extensibility\Test;
 
 require_once __DIR__ . '/Base.php';
+require_once __DIR__ . '/../CallbackFactory.php';
 
 /**
  * @package Extensibility
@@ -14,156 +15,141 @@ require_once __DIR__ . '/Base.php';
  */
 class BaseTest extends Base
 {
+
   /**
-   * @test
+   * @param array|string $function
+   * @return string
    */
-  public function addAndRemove()
+  public function getFunctionName($function)
   {
-    \Gustavus\Extensibility\Base::add('TestTag', 'is_int');
-
-    $expected = array(
-      'TestTag' => array(
-        10  => array(
-          0 => array(
-            'function'          => 'is_int',
-            'acceptedArguments' => 1,
-          ),
-        ),
-      ),
-    );
-
-    $this->assertSame($expected, $this->get('\Gustavus\Extensibility\Base', 'items'));
-
-    \Gustavus\Extensibility\Base::add('TestTag', 'is_int');
-
-    $expected = array(
-      'TestTag' => array(
-        10  => array(
-          1 => array(
-            'function'          => 'is_int',
-            'acceptedArguments' => 1,
-          ),
-        ),
-      ),
-    );
-
-    $this->assertSame($expected, $this->get('\Gustavus\Extensibility\Base', 'items'));
-
-    \Gustavus\Extensibility\Base::add('TestTag', 'is_string');
-
-    $expected = array(
-      'TestTag' => array(
-        10  => array(
-          1 => array(
-            'function'          => 'is_int',
-            'acceptedArguments' => 1,
-          ),
-          2 => array(
-            'function'          => 'is_string',
-            'acceptedArguments' => 1,
-          ),
-        ),
-      ),
-    );
-
-    $this->assertSame($expected, $this->get('\Gustavus\Extensibility\Base', 'items'));
-
-    \Gustavus\Extensibility\Base::add('TestTag', 'is_object', 100);
-
-    $expected = array(
-      'TestTag' => array(
-        10  => array(
-          1 => array(
-            'function'          => 'is_int',
-            'acceptedArguments' => 1,
-          ),
-          2 => array(
-            'function'          => 'is_string',
-            'acceptedArguments' => 1,
-          ),
-        ),
-        100 => array(
-          array(
-            'function'          => 'is_object',
-            'acceptedArguments' => 1,
-          ),
-        ),
-      ),
-    );
-
-    $this->assertSame($expected, $this->get('\Gustavus\Extensibility\Base', 'items'));
-
-    \Gustavus\Extensibility\Base::add('SecondTestTag', 'is_array');
-
-    $expected = array(
-      'TestTag' => array(
-        10  => array(
-          1 => array(
-            'function'          => 'is_int',
-            'acceptedArguments' => 1,
-          ),
-          2 => array(
-            'function'          => 'is_string',
-            'acceptedArguments' => 1,
-          ),
-        ),
-        100 => array(
-          array(
-            'function'          => 'is_object',
-            'acceptedArguments' => 1,
-          ),
-        ),
-      ),
-      'SecondTestTag' => array(
-        10 => array(
-          array(
-            'function'          => 'is_array',
-            'acceptedArguments' => 1,
-          ),
-        ),
-      ),
-    );
-
-    $this->assertSame($expected, $this->get('\Gustavus\Extensibility\Base', 'items'));
-
-    \Gustavus\Extensibility\Base::remove('TestTag', 'is_int');
-
-    $expected = array(
-      'TestTag' => array(
-        10  => array(
-          2 => array(
-            'function'          => 'is_string',
-            'acceptedArguments' => 1,
-          ),
-        ),
-        100 => array(
-          array(
-            'function'          => 'is_object',
-            'acceptedArguments' => 1,
-          ),
-        ),
-      ),
-      'SecondTestTag' => array(
-        10 => array(
-          array(
-            'function'          => 'is_array',
-            'acceptedArguments' => 1,
-          ),
-        ),
-      ),
-    );
-
-    $this->assertSame($expected, $this->get('\Gustavus\Extensibility\Base', 'items'));
+    if (is_array($function)) {
+      return $function[1];
+    } else {
+      return $function;
+    }
   }
 
   /**
    * @test
    */
-  public function getNumberOfArguments()
+  public function testGetFunctionName()
   {
-    $this->assertSame(1, $this->call('\Gustavus\Extensibility\Base', 'getNumberOfArguments', array('is_int')));
-    $this->assertSame(6, $this->call('\Gustavus\Extensibility\Base', 'getNumberOfArguments', array('mktime')));
-    $this->assertSame(0, $this->call('\Gustavus\Extensibility\Base', 'getNumberOfArguments', array(array($this, 'getNumberOfArguments'))));
+    $this->assertSame('test', $this->getFunctionName('test'));
+    $this->assertSame('testTwo', $this->getFunctionName(array('arst', 'testTwo')));
+  }
+
+  /**
+   * @param array $expectedStructure
+   */
+  private function checkItems(array $expectedStructure)
+  {
+    $allItems = $this->get('\Gustavus\Extensibility\Base', 'items');
+    $this->assertInternalType('array', $allItems);
+    $this->assertCount(count($expectedStructure), $allItems);
+
+    $itemsIterator = new \MultipleIterator();
+    $itemsIterator->attachIterator(new \ArrayIterator($allItems));
+    $itemsIterator->attachIterator(new \ArrayIterator($expectedStructure));
+
+    foreach ($itemsIterator as $items) {
+      $keys = $itemsIterator->key();
+      $this->assertSame($keys[1], $keys[0]);
+
+      $prioritiesIterator = new \MultipleIterator();
+      $prioritiesIterator->attachIterator(new \ArrayIterator($items[0]));
+      $prioritiesIterator->attachIterator(new \ArrayIterator($items[1]));
+
+      foreach ($prioritiesIterator as $priorities) {
+        $keys = $prioritiesIterator->key();
+        $this->assertSame($keys[1], $keys[0]);
+
+        $callbacksIterator = new \MultipleIterator();
+        $callbacksIterator->attachIterator($priorities[0]); // SplObjectStorage
+        $callbacksIterator->attachIterator(new \ArrayIterator($priorities[1]));
+
+        foreach ($callbacksIterator as $callbacks) {
+          $function = $this->getFunctionName($this->get($callbacks[0], 'function'));
+
+          $keys = $callbacksIterator->key();
+          $this->assertSame($keys[1], $function);
+
+          $this->assertSame($callbacks[0]->getNumberOfParameters(), $callbacks[1]);
+        }
+      }
+    }
+  }
+  /**
+   * @test
+   */
+  public function addAndRemove()
+  {
+    $this->assertTrue(\Gustavus\Extensibility\Base::add('TestTag', 'is_int'));
+
+    $expected = array(
+      'TestTag' => array(
+        10  => array(
+          'is_int' => 1,
+        ),
+      ),
+    );
+
+    $this->checkItems($expected);
+
+    \Gustavus\Extensibility\Base::add('TestTag', 'is_int');
+    $this->checkItems($expected);
+
+    \Gustavus\Extensibility\Base::add('TestTag', 'is_string');
+    $expected['TestTag'][10]['is_string'] = 1;
+    $this->checkItems($expected);
+
+    \Gustavus\Extensibility\Base::add('TestTag', 'is_object', 100);
+    $expected['TestTag'][100]['is_object'] = 1;
+    $this->checkItems($expected);
+
+    \Gustavus\Extensibility\Base::add('SecondTestTag', 'is_array');
+    $expected['SecondTestTag'][10]['is_array'] = 1;
+    $this->checkItems($expected);
+
+    $this->assertTrue(\Gustavus\Extensibility\Base::remove('TestTag', 'is_int'));
+    unset($expected['TestTag'][10]['is_int']);
+    $this->checkItems($expected);
+
+    \Gustavus\Extensibility\Base::add('TestTag', 'is_int');
+    $expected['TestTag'][10]['is_int'] = 1;
+    $this->checkItems($expected);
+  }
+
+  /**
+   * @test
+   */
+  public function removeNonExistent()
+  {
+    $expected = array();
+    $this->checkItems($expected);
+
+    $this->assertFalse(\Gustavus\Extensibility\Base::remove('TestTag', 'is_int'));
+    $this->checkItems($expected);
+
+    \Gustavus\Extensibility\Base::add('TestTag', 'is_int');
+    $this->assertFalse(\Gustavus\Extensibility\Base::remove('TestTag', 'is_string'));
+
+    $expected = array(
+      'TestTag' => array(
+        10  => array(
+          'is_int' => 1,
+        ),
+      ),
+    );
+
+    $this->checkItems($expected);
+  }
+
+  /**
+   * @test
+   */
+  public function getIteratorWithNonExistentTag()
+  {
+    $this->assertNULL($this->call('\Gustavus\Extensibility\Base', 'getIterator', array('nonsenseTag')));
   }
 
   /**
@@ -235,16 +221,6 @@ class BaseTest extends Base
     $this->call('\Gustavus\Extensibility\Base', 'startApply', array('TestTag'));
 
     $this->assertSame('TestTag', $this->get('\Gustavus\Extensibility\Base', 'currentTag'));
-  }
-
-  /**
-   * @test
-   */
-  public function execute()
-  {
-    $this->assertTrue($this->call('\Gustavus\Extensibility\Base', 'execute', array('is_int', array(1))));
-    $this->assertTrue($this->call('\Gustavus\Extensibility\Base', 'execute', array('is_int', array(100))));
-    $this->assertFalse($this->call('\Gustavus\Extensibility\Base', 'execute', array('is_int', array('100'))));
   }
 
 }
