@@ -127,6 +127,18 @@ class CallbackFactoryTest extends \Gustavus\Test\Test
     $this->assertInstanceOf('\Gustavus\Extensibility\Callback', $callbackB);
     $this->assertInstanceOf('\Gustavus\Extensibility\Callback', $callbackC);
   }
+
+  /**
+   * @test
+   */
+  public function classesForTests()
+  {
+    $foo = new Foo();
+    $this->assertNULL($foo->foo());
+
+    $bar = new Bar();
+    $this->assertNULL($bar->foo());
+  }
 }
 
 class Foo
