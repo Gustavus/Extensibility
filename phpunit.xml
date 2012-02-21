@@ -12,8 +12,6 @@
   </filter>
 
   <php>
-    <ini name="memory_limit" value="-1"/>
     <ini name="xdebug.collect_params" value="0"/>
-    <server name="DOCUMENT_ROOT" value="/cis/www/"/>
   </php>
 </phpunit>
