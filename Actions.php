@@ -1,7 +1,6 @@
 <?php
 /**
- * @package General
- * @subpackage Extensibility
+ * @package Extensibility
  */
 
 namespace Gustavus\Extensibility;
@@ -10,12 +9,13 @@ require_once __DIR__ . '/Base.php';
 /**
  * Runs actions
  *
- * @package General
- * @subpackage Extensibility
+ * @package Extensibility
  */
 class Actions extends Base
 {
   /**
+   * Calls all of the callback functions added to the given tag
+   *
    * @param string $tag
    * @return void
    */
@@ -23,23 +23,20 @@ class Actions extends Base
   {
     self::startApply($tag);
 
-    $result = null;
-
-    if (isset(self::$items[$tag])) {
-      self::prioritize($tag);
-      foreach (self::$items[$tag] as $priority) {
-        foreach ($priority as $item) {
-          if (is_callable($item['function'])) {
+    if ($iterator = self::getIterator($tag)) {
+      foreach ($iterator as $callbacks) {
+        foreach ($callbacks as $callback) {
+          if ($callback->isCallable()) {
             $arguments  = func_get_args();
             $arguments  = array_slice($arguments, 1);
 
-            if ($item['acceptedArguments'] == 0) {
-              $arguments  = null;
-            } else if ($item['acceptedArguments'] < count($arguments)) {
-              $arguments  = array_slice($arguments, 0, $item['acceptedArguments']);
+            if ($callback->getNumberOfParameters() === 0) {
+              $arguments  = array();
+            } else if ($callback->getNumberOfParameters() < count($arguments)) {
+              $arguments  = array_slice($arguments, 0, $callback->getNumberOfParameters());
             }
 
-            $result = self::execute($item['function'], $arguments);
+            $callback->execute($arguments);
 
             if (self::isStopRequested()) {
               return self::endApply();
@@ -50,15 +47,6 @@ class Actions extends Base
     }
 
     return self::endApply();
-  }
-
-  /**
-   * @param string $tag
-   * @return void
-   */
-  final static private function startApply($tag)
-  {
-    self::$currentTag = $tag;
   }
 
   /**

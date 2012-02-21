@@ -1,21 +1,21 @@
 <?php
 /**
- * @package General
- * @subpackage Extensibility
+ * @package Extensibility
  */
 
 namespace Gustavus\Extensibility;
 
+require_once __DIR__ . '/CallbackFactory.php';
+
 /**
  * Base class for filters and actions
  *
- * @package General
- * @subpackage Extensibility
+ * @package Extensibility
  */
 abstract class Base
 {
   /**
-   *
+   * Callbacks organized by tag > priority > order added
    * @var array
    */
   protected static $items = array();
@@ -33,34 +33,46 @@ abstract class Base
   private static $stop = false;
 
   /**
+   * Adds a callback to the given tag
+   *
    * @param string $tag
    * @param callback $function
    * @param integer $priority
-   * @param integer $acceptedArguments
+   * @param integer $numberOfParameters
    * @return boolean
    */
-  final static public function add($tag, $function, $priority = 10, $acceptedArguments = 1)
+  final static public function add($tag, $function, $priority = 10, $numberOfParameters = null)
   {
-    // Remove it if it exists, so it doesn't get added twice
-    self::remove($tag, $function, $priority, $acceptedArguments);
-    self::$items[$tag][$priority][] = array('function' => $function, 'acceptedArguments' => $acceptedArguments);
+    if (!isset(self::$items[$tag][$priority])) {
+      self::$items[$tag][$priority] = new \SplObjectStorage();
+    }
+
+    $callback = CallbackFactory::getCallback($function, $numberOfParameters);
+
+    if (!self::$items[$tag][$priority]->contains($callback)) {
+      self::$items[$tag][$priority]->attach($callback);
+    }
+
+    return true;
   }
 
   /**
+   * Removes a callback from the tag
+   *
    * @param string $tag
    * @param callback $function
    * @param integer $priority
-   * @param integer $acceptedArguments
+   * @param integer $numberOfParameters
    * @return boolean
    */
-  final static public function remove($tag, $function, $priority = 10, $acceptedArguments = 1)
+  final static public function remove($tag, $function, $priority = 10, $numberOfParameters = null)
   {
     if (isset(self::$items[$tag][$priority])) {
-      foreach (self::$items[$tag][$priority] as $key => $item) {
-        if ($item == array('function' => $function, 'acceptedArguments' => $acceptedArguments)) {
-          unset(self::$items[$tag][$priority][$key]);
-          return true;
-        }
+      $callback = CallbackFactory::getCallback($function, $numberOfParameters);
+
+      if (self::$items[$tag][$priority]->contains($callback)) {
+        self::$items[$tag][$priority]->detach($callback);
+        return true;
       }
     }
 
@@ -68,12 +80,28 @@ abstract class Base
   }
 
   /**
-   * Stops the rest of the filters and actions in the current tag from being
-   * run
-   * @param mixed $return Value to return
+   * @param string $tag
+   * @return \RecursiveIteratorIterator
+   */
+  final static protected function getIterator($tag)
+  {
+    if (isset(self::$items[$tag])) {
+      self::prioritize($tag);
+
+      return new \RecursiveIteratorIterator(
+          new \RecursiveArrayIterator(self::$items[$tag]),
+          \RecursiveIteratorIterator::SELF_FIRST,
+          \RecursiveIteratorIterator::CATCH_GET_CHILD
+      );
+    }
+  }
+
+  /**
+   * Stops the rest of the filters and actions in the current tag from being run
+   *
    * @return void
    */
-  final static public function stop($return = null)
+  final static public function stop()
   {
     self::$stop = true;
   }
@@ -83,11 +111,7 @@ abstract class Base
    */
   final static protected function isStopRequested()
   {
-    if (self::$stop === true) {
-      return true;
-    } else {
-      return false;
-    }
+    return self::$stop;
   }
 
   /**
@@ -95,7 +119,7 @@ abstract class Base
    */
   final static protected function doStop()
   {
-    self::$stop     = false;
+    self::$stop       = false;
     self::$currentTag = null;
   }
 
@@ -109,23 +133,11 @@ abstract class Base
   }
 
   /**
-   * @param mixed $callback
-   * @param array $arguments
+   * @param string $tag
+   * @return void
    */
-  final static protected function execute($callback, array $arguments)
+  final static protected function startApply($tag)
   {
-    return call_user_func_array($callback, $arguments);
-
-    // Using the reflection class seems to be slower than using call_user_func_array()
-    if (is_array($callback)) {
-      // Function is in a class
-      $ref    = new \ReflectionClass(get_class($callback[0]));
-      $method   = $ref->getMethod($callback[1]);
-      return $method->invokeArgs($callback[0], $arguments);
-    } else {
-      // Function is not in a class
-      $method   = new \ReflectionFunction($callback);
-      return $method->invokeArgs($arguments);
-    }
+    self::$currentTag = $tag;
   }
 }
