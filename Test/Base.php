@@ -31,7 +31,8 @@ abstract class Base extends \Gustavus\Test\Test
    */
   public function setUp()
   {
-    $this->set('\Gustavus\Extensibility\CallbackFactory', 'callbackCache', null);
+    $this->set('\Gustavus\Extensibility\CallbackFactory', 'objectCallbackCache', null);
+    $this->set('\Gustavus\Extensibility\CallbackFactory', 'nonObjectCallbackCache', null);
 
     $this->set('\Gustavus\Extensibility\Base', 'items', array());
     $this->set('\Gustavus\Extensibility\Base', 'currentTag', null);
