@@ -6,9 +6,6 @@
 
 namespace Gustavus\Extensibility\Test;
 
-require_once __DIR__ . '/Base.php';
-require_once __DIR__ . '/../CallbackFactory.php';
-
 /**
  * @package Extensibility
  * @subpackage Test

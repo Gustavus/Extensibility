@@ -4,10 +4,14 @@
  */
 
 namespace Gustavus\Extensibility;
-require_once __DIR__ . '/Callback.php';
 
 /**
- * Callbacks factory
+ * Callback factory
+ *
+ * Example:
+ * <code>
+ * $callback = CallbackFactory::getCallback('myFunction');
+ * </code>
  *
  * @package Extensibility
  */
@@ -24,6 +28,8 @@ abstract class CallbackFactory
   private static $objectCallbackCache;
 
   /**
+   * Determines of the callback function is an object's method.
+   *
    * @param mixed $function callback
    * @return boolean
    */
@@ -33,6 +39,8 @@ abstract class CallbackFactory
   }
 
   /**
+   * Gets the key used to cache the given callback function.
+   *
    * @param mixed $function callback
    * @param integer $numberOfParameters
    * @return string
@@ -47,6 +55,8 @@ abstract class CallbackFactory
   }
 
   /**
+   * Gets the Callback object for the given function.
+   *
    * @param mixed $function callback
    * @param integer $numberOfParameters
    * @return Callback
@@ -72,6 +82,9 @@ abstract class CallbackFactory
     $key   = self::getCacheKey($function, $numberOfParameters);
 
     if (!isset($cache[$key])) {
+      // The Callback was not in the cache, so we need to create a new one
+      // and store it in the cache for reuse.
+
       $cache[$key] = new Callback($function, $numberOfParameters);
 
       if (self::isCallbackInObject($function)) {

@@ -56,9 +56,9 @@ class Callback
   private function getReflection()
   {
     if ($this->reflection === null) {
-      if (is_array($this->function)) {
+      if ($this->isMethod()) {
         $this->reflection = new \ReflectionMethod($this->function[0], $this->function[1]);
-      } else if (is_string($this->function)) {
+      } else if ($this->isFunction()) {
         $this->reflection = new \ReflectionFunction($this->function);
       }
     }
@@ -67,6 +67,8 @@ class Callback
   }
 
   /**
+   * Gets the number of parameters that this callback function accepts.
+   *
    * @return integer
    */
   public function getNumberOfParameters()
@@ -79,6 +81,8 @@ class Callback
   }
 
   /**
+   * Determines if this callback can be called.
+   *
    * @return boolean
    */
   public function isCallable()
@@ -87,12 +91,34 @@ class Callback
   }
 
   /**
+   * Determines if this callback is a method on an object.
+   *
+   * @return boolean
+   */
+  private function isMethod()
+  {
+    return is_array($this->function);
+  }
+
+  /**
+   * Determines if this callback is a standard function (not an object's method).
+   *
+   * @return boolean
+   */
+  private function isFunction()
+  {
+    return is_string($this->function);
+  }
+
+  /**
+   * Executes this callback function.
+   *
    * @param array $arguments
    * @return mixed
    */
   public function execute(array $arguments = array())
   {
-    if (is_array($this->function)) {
+    if ($this->isMethod()) {
       return $this->getReflection()->invokeArgs($this->function[0], $arguments);
     } else {
       return $this->getReflection()->invokeArgs($arguments);

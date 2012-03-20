@@ -6,10 +6,6 @@
 
 namespace Gustavus\Extensibility\Test;
 
-require_once 'Gustavus/Test/Test.php';
-require_once 'Gustavus/Extensibility/CallbackFactory.php';
-require_once 'Gustavus/Extensibility/Base.php';
-
 /**
  * @package Extensibility
  * @subpackage Test
