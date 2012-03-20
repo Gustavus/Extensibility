@@ -31,7 +31,12 @@ abstract class Base
   private static $stop = false;
 
   /**
-   * Adds a callback to the given tag
+   * Attaches a callback function to the given tag with an optional priority.
+   *
+   * Example:
+   * <code>
+   * Filters::add('myTag', 'myFunction');
+   * </code>
    *
    * @param string $tag
    * @param callback $function
@@ -55,7 +60,12 @@ abstract class Base
   }
 
   /**
-   * Removes a callback from the tag
+   * Removes a callback function from the specified tag.
+   *
+   * Example:
+   * <code>
+   * Filters::remove('myTag', 'myFunction');
+   * </code>
    *
    * @param string $tag
    * @param callback $function
@@ -78,6 +88,8 @@ abstract class Base
   }
 
   /**
+   * Gets the iterator for the specified tag.
+   *
    * @param string $tag
    * @return \RecursiveIteratorIterator
    */
@@ -95,7 +107,7 @@ abstract class Base
   }
 
   /**
-   * Stops the rest of the filters and actions in the current tag from being run
+   * Prevents further filters or actions in the current tag from running.
    *
    * @return void
    */
@@ -105,6 +117,8 @@ abstract class Base
   }
 
   /**
+   * Determines of a callback function has requested filters or actions to stop.
+   *
    * @return boolean
    */
   final static protected function isStopRequested()
@@ -122,6 +136,8 @@ abstract class Base
   }
 
   /**
+   * Sorts the callbacks for the given tag by priority.
+   *
    * @param string $tag
    * @return void
    */

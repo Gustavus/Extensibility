@@ -67,6 +67,8 @@ class Callback
   }
 
   /**
+   * Gets the number of parameters that this callback function accepts.
+   *
    * @return integer
    */
   public function getNumberOfParameters()
@@ -79,6 +81,8 @@ class Callback
   }
 
   /**
+   * Determines if this callback can be called.
+   *
    * @return boolean
    */
   public function isCallable()
@@ -107,6 +111,8 @@ class Callback
   }
 
   /**
+   * Executes this callback function.
+   *
    * @param array $arguments
    * @return mixed
    */

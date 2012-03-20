@@ -6,14 +6,23 @@
 namespace Gustavus\Extensibility;
 
 /**
- * Runs filters
+ * Applies filters to content.
+ *
+ * Example:
+ * <code>
+ * function myFunction($content) {
+ *   return 'Filtered: ' . strtoupper($content);
+ * }
+ * Filters::add('myTag', 'myFunction');
+ * echo Filters::apply('myTag', 'my content'); // Filtered: MY CONTENT
+ * </code>
  *
  * @package Extensibility
  */
 class Filters extends Base
 {
   /**
-   * Calls all of the callback functions added to the given tag and sets $content to the result
+   * Calls all of the callback functions added to the given tag and sets $content to the result.
    *
    * @param string $tag
    * @param mixed $content
@@ -50,6 +59,8 @@ class Filters extends Base
   }
 
   /**
+   * Called when filters are done being applied, whether they were stopped or completed naturally.
+   *
    * @param mixed $content
    * @return mixed
    */

@@ -6,14 +6,14 @@
 namespace Gustavus\Extensibility;
 
 /**
- * Runs actions
+ * Runs actions.
  *
  * @package Extensibility
  */
 class Actions extends Base
 {
   /**
-   * Calls all of the callback functions added to the given tag
+   * Calls all of the callback functions added to the given tag.
    *
    * @param string $tag
    * @return void
@@ -49,6 +49,8 @@ class Actions extends Base
   }
 
   /**
+   * Called when actions are done being applied, whether they were stopped or completed naturally.
+   *
    * @param string $string
    * @return void
    */
