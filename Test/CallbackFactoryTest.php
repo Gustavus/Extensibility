@@ -8,9 +8,6 @@ namespace Gustavus\Extensibility\Test;
 
 use Gustavus\Extensibility\CallbackFactory;
 
-require_once 'Gustavus/Test/Test.php';
-require_once 'Gustavus/Extensibility/CallbackFactory.php';
-
 /**
  * @package Extensibility
  * @subpackage Test

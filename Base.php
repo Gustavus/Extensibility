@@ -5,8 +5,6 @@
 
 namespace Gustavus\Extensibility;
 
-require_once __DIR__ . '/CallbackFactory.php';
-
 /**
  * Base class for filters and actions
  *

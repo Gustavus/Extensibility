@@ -8,9 +8,6 @@ namespace Gustavus\Extensibility\Test;
 
 use Gustavus\Extensibility\Actions;
 
-require_once __DIR__ . '/Base.php';
-require_once 'Gustavus/Extensibility/Actions.php';
-
 /**
  * @package Extensibility
  * @subpackage Test

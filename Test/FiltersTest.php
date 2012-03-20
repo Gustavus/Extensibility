@@ -8,9 +8,6 @@ namespace Gustavus\Extensibility\Test;
 
 use Gustavus\Extensibility\Filters;
 
-require_once __DIR__ . '/Base.php';
-require_once 'Gustavus/Extensibility/Filters.php';
-
 /**
  * @package Extensibility
  * @subpackage Test

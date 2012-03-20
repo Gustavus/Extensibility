@@ -4,7 +4,6 @@
  */
 
 namespace Gustavus\Extensibility;
-require_once __DIR__ . '/Base.php';
 
 /**
  * Runs filters
