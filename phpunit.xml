@@ -1,4 +1,4 @@
-<phpunit>
+<phpunit bootstrap="autoloader.php">
   <testsuites>
     <testsuite name="Extensibility">
       <directory suffix="Test.php">Test</directory>
