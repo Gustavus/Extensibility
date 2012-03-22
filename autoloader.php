@@ -17,12 +17,12 @@ class ClassAutoloader
     $className = implode('/', $className);
 
     $paths = array();
-    if (file_exists($paths[] = __DIR__ . "/$className")) {
+    if (file_exists($paths[] = __DIR__ . "/$className.php")) {
       // Part of project
       $path = end($paths);
       echo "> Autoloading $path\n";
       require_once $path;
-    } else if (file_exists($paths[] = __DIR__ . "/$vendor/$project/$className")) {
+    } else if (file_exists($paths[] = __DIR__ . "/$vendor/$project/$className.php")) {
       // Part of a dependency
       $path = end($paths);
       echo "> Autoloading $path\n";
