@@ -22,7 +22,7 @@ class ClassAutoloader
       $path = end($paths);
       echo "> Autoloading $path\n";
       require_once $path;
-    } else if (file_exists($paths[] = __DIR__ . "/$vendor/$project/$className.php")) {
+    } else if (file_exists($paths[] = realpath(__DIR__ . "/../../vendor/$vendor/$project/$className.php"))) {
       // Part of a dependency
       $path = end($paths);
       echo "> Autoloading $path\n";
