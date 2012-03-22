@@ -8,9 +8,9 @@ class ClassAutoloader
     spl_autoload_register(array($this, 'loader'));
   }
 
-  public function loader($className)
+  public function loader($fullClassName)
   {
-    $className = explode('\\', $className);
+    $className = explode('\\', $fullClassName);
 
     $vendor    = array_shift($className);
     $project   = array_shift($className);
@@ -18,10 +18,14 @@ class ClassAutoloader
 
     if (file_exists($path = __DIR__ . "/$className")) {
       // Part of project
+      echo "> Autoloading $path\n";
       require_once $path;
-    } else if (file_exists($path = __DIR__ . "/vendor/$vendor/$project/$className")) {
+    } else if (file_exists($path = __DIR__ . "/$vendor/$project/$className")) {
       // Part of a dependency
+      echo "> Autoloading $path\n";
       require_once $path;
+    } else {
+      echo "> Failed to autoload $fullClassName\n";
     }
   }
 }
