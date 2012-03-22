@@ -16,16 +16,19 @@ class ClassAutoloader
     $project   = array_shift($className);
     $className = implode('/', $className);
 
-    if (file_exists($path = __DIR__ . "/$className")) {
+    $paths = array();
+    if (file_exists($paths[] = __DIR__ . "/$className")) {
       // Part of project
+      $path = end($paths);
       echo "> Autoloading $path\n";
       require_once $path;
-    } else if (file_exists($path = __DIR__ . "/$vendor/$project/$className")) {
+    } else if (file_exists($paths[] = __DIR__ . "/$vendor/$project/$className")) {
       // Part of a dependency
+      $path = end($paths);
       echo "> Autoloading $path\n";
       require_once $path;
     } else {
-      echo "> Failed to autoload $fullClassName\n";
+      printf("> Failed to autoload $fullClassName. Tried %s\n", implode(', ', $paths));
     }
   }
 }
