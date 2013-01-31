@@ -31,6 +31,15 @@ class CallbackTest extends \Gustavus\Test\Test
   }
 
   /**
+   * @param  string $content
+   * @return string
+   */
+  public static function staticCallbackFunction($content)
+  {
+    return $content . 'arst';
+  }
+
+  /**
    * For coverage report
    * @test
    */
@@ -51,6 +60,9 @@ class CallbackTest extends \Gustavus\Test\Test
 
     $callback = new Callback(array($this, 'aCallbackMethod'));
     $this->assertSame('callback!', $callback->execute());
+
+    $callback = new Callback(array('Gustavus\Extensibility\Test\CallbackTest', 'staticCallbackFunction'));
+    $this->assertSame('tsraarst', $callback->execute(array('tsra')));
   }
 
   /**
@@ -81,5 +93,8 @@ class CallbackTest extends \Gustavus\Test\Test
 
     $callback = new Callback(array($this, 'privateMethod'));
     $this->assertFalse($callback->isCallable());
+
+    $callback = new Callback(array('Gustavus\Extensibility\Test\CallbackTest', 'staticCallbackFunction'));
+    $this->assertTrue($callback->isCallable());
   }
 }
