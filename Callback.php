@@ -1,6 +1,8 @@
 <?php
 /**
  * @package Extensibility
+ * @author  Joe Lencioni
+ * @author  Billy Visto
  */
 
 namespace Gustavus\Extensibility;
@@ -9,6 +11,8 @@ namespace Gustavus\Extensibility;
  * Callbacks used by Filters and Actions
  *
  * @package Extensibility
+ * @author  Joe Lencioni
+ * @author  Billy Visto
  */
 class Callback
 {
@@ -111,6 +115,19 @@ class Callback
   }
 
   /**
+   * Checks to see if the function is a method on an object
+   *
+   * @return boolean
+   */
+  private function isMethodOnObject()
+  {
+    if (is_array($this->function) && is_object($this->function[0])) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Executes this callback function.
    *
    * @param array $arguments
@@ -119,7 +136,11 @@ class Callback
   public function execute(array $arguments = array())
   {
     if ($this->isMethod()) {
-      return $this->getReflection()->invokeArgs($this->function[0], $arguments);
+      if ($this->isMethodOnObject()) {
+        return $this->getReflection()->invokeArgs($this->function[0], $arguments);
+      } else {
+        return call_user_func_array($this->function, $arguments);
+      }
     } else {
       return $this->getReflection()->invokeArgs($arguments);
     }
