@@ -19,17 +19,24 @@ class FiltersTest extends Base
    */
   public function apply()
   {
+    $ftest = new FilterTestClass();
+
     Filters::add('TestTag', array($this, 'noArgumentsCallbackFilter'));
 
     $this->assertSame('test content', Filters::apply('TestTag', 'test content', 'test', 'test 2'));
     $this->assertSame(1, $this->called);
     $this->assertSame(null, $this->testingVar);
 
+    Filters::add('TestTag', 'Gustavus\\Extensibility\\Test\\filterContent');
+    Filters::add('TestTag', [$ftest, 'filter']);
+    Filters::add('TestTag', ['Gustavus\\Extensibility\\Test\\FilterTestClass', 'staticFilter']);
+    Filters::add('TestTag', function($content) { return $content . '4'; });
+
     Filters::add('TestTag', array($this, 'oneArgumentCallbackFilter'));
     Filters::add('TestTag', array($this, 'stopRequestedCallbackFilter'));
     Filters::add('TestTag', array($this, 'afterStopRequestedCallbackFilter'));
 
-    $this->assertSame('Test content', Filters::apply('TestTag', 'test content', 'test', 'test 2'));
+    $this->assertSame('Test content1234', Filters::apply('TestTag', 'test content', 'test', 'test 2'));
     $this->assertSame(4, $this->called);
     $this->assertSame('test', $this->testingVar);
   }
@@ -105,5 +112,24 @@ class FiltersTest extends Base
 
     $this->assertFalse($this->get('\Gustavus\Extensibility\Base', 'stop'));
     $this->assertFalse($this->call('\Gustavus\Extensibility\Base', 'isStopRequested'));
+  }
+}
+
+
+function filterContent($content)
+{
+  return $content . '1';
+}
+
+class FilterTestClass
+{
+  public function filter($content)
+  {
+    return $content . '2';
+  }
+
+  public static function staticFilter($content)
+  {
+    return $content . '3';
   }
 }

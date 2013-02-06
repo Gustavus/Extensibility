@@ -1,9 +1,17 @@
 <?php
 /**
- * @package Extensibility
+ * CallbackFactory.php
+ *
+ * @package Gustavus\Extensibility
+ *
+ * @author Joe Lencioni
+ * @author Chris Rog
  */
-
 namespace Gustavus\Extensibility;
+
+use \InvalidArgumentException;
+
+
 
 /**
  * Callback factory
@@ -13,86 +21,96 @@ namespace Gustavus\Extensibility;
  * $callback = CallbackFactory::getCallback('myFunction');
  * </code>
  *
- * @package Extensibility
+ * @package Gustavus\Extensibility
+ *
+ * @author Joe Lencioni
+ * @author Chris Rog
  */
 abstract class CallbackFactory
 {
   /**
+   * Contains an array of arrays, keyed by the callback's hashcode. Each value in the sub array
+   * contains an associative array containing the original key and the value:
+   *
+   * cache[hashcode] > [ [key=>input, value=>Callback], [key=>input, value=>Callback], ... ]
+   *
    * @var array
    */
-  private static $nonObjectCallbackCache;
+  private static $cache;
 
   /**
-   * @var \SplObjectStorage
-   */
-  private static $objectCallbackCache;
-
-  /**
-   * Determines of the callback function is an object's method.
+   * Generates a hashcode for the callback.
    *
-   * @param mixed $function callback
-   * @return boolean
-   */
-  private static function isCallbackInObject($function)
-  {
-    return (is_array($function) && is_object($function[0]));
-  }
-
-  /**
-   * Gets the key used to cache the given callback function.
+   * @param callable $callback
+   *  The callback for which to generate the hashcode.
    *
-   * @param mixed $function callback
-   * @param integer $numberOfParameters
+   * @param integer $paramCount
+   *  The number of parameters the callback is expecting.
+   *
    * @return string
+   *  The hashcode of the callback.
    */
-  private static function getCacheKey($function, $numberOfParameters = null)
+  private static function getHashCode(callable $callback, $paramCount)
   {
-    if (self::isCallbackInObject($function)) {
-      $function = $function[1];
+    $data = ['params' => $paramCount];
+
+    if (is_array($callback)) {
+      $data['base'] = is_object($callback[0]) ? spl_object_hash($callback[0]) : $callback[0];
+      $data['offset'] = $callback[1];
+    } else if (is_object($callback)) {
+      $data['base'] = spl_object_hash($callback);
+    } else {
+      $data['base'] = $callback;
     }
 
-    return hash('md4', json_encode(array($function, $numberOfParameters)));
+    return hash('md4', json_encode($data));
   }
 
+
   /**
-   * Gets the Callback object for the given function.
+   * Creates a Callback wrapper for the given callback.
    *
-   * @param mixed $function callback
-   * @param integer $numberOfParameters
+   * @param callable $callback
+   *  The callback to wrap.
+   *
+   * @param integer $paramCount
+   *  Optional. The number of parameters the callback is expecting. Must be a non-negative integer.
+   *
+   * @throws InvalidArgumentException
+   *  if $paramCount is given as a non-integer value, or a negative value.
+   *
    * @return Callback
+   *  A Callback instance wrapping the specified callback.
    */
-  public static function getCallback($function, $numberOfParameters = null)
+  public static function getCallback(callable $callback, $paramCount = null)
   {
-    if (self::isCallbackInObject($function)) {
-      // Initialize SplObjectStorage
-      if (self::$objectCallbackCache === null) {
-        self::$objectCallbackCache = new \SplObjectStorage();
-      }
-
-      $object = $function[0];
-      if (!isset(self::$objectCallbackCache[$object])) {
-        self::$objectCallbackCache[$object] = array();
-      }
-
-      $cache = self::$objectCallbackCache[$object];
-    } else {
-      $cache = &self::$nonObjectCallbackCache;
+    if (isset($paramCount) && (!is_int($paramCount) || $paramCount < 0)) {
+      throw new InvalidArgumentException('$paramCount is not a valid integer value.');
     }
 
-    $key   = self::getCacheKey($function, $numberOfParameters);
+    $hashcode = self::getHashCode($callback, $paramCount);
+    $wrapper = null;
 
-    if (!isset($cache[$key])) {
-      // The Callback was not in the cache, so we need to create a new one
-      // and store it in the cache for reuse.
+    if (!isset(self::$cache)) {
+      self::$cache = [];
+    }
 
-      $cache[$key] = new Callback($function, $numberOfParameters);
+    if (!isset(self::$cache[$hashcode])) {
+      self::$cache[$hashcode] = [];
+    }
 
-      if (self::isCallbackInObject($function)) {
-        // We need to do it this way because SplObjectStorage does not use indirect modification. More info: http://stackoverflow.com/questions/9380430/using-splobjectstorage-as-a-data-map-can-you-use-a-mutable-array-as-the-data
-        self::$objectCallbackCache[$object] = $cache;
+    foreach (self::$cache[$hashcode] as $kvpair) {
+      if ($kvpair['key'] === $callback) {
+        $wrapper = $kvpair['value'];
+        break;
       }
     }
 
-    return $cache[$key];
+    if (!isset($wrapper)) {
+      $wrapper = new Callback($callback, $paramCount);
+      array_push(self::$cache[$hashcode], ['key'=>$callback, 'value'=>$wrapper]);
+    }
+
+    return $wrapper;
   }
 }

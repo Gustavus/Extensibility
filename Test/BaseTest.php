@@ -65,7 +65,7 @@ class BaseTest extends Base
         $callbacksIterator->attachIterator(new \ArrayIterator($priorities[1]));
 
         foreach ($callbacksIterator as $callbacks) {
-          $function = $this->getFunctionName($this->get($callbacks[0], 'function'));
+          $function = $this->getFunctionName($this->get($callbacks[0], 'callback'));
 
           $keys = $callbacksIterator->key();
           $this->assertSame($keys[1], $function);
