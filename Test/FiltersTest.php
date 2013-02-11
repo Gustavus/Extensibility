@@ -116,11 +116,17 @@ class FiltersTest extends Base
 }
 
 
+/**
+ * Test function for the apply test
+ */
 function filterContent($content)
 {
   return $content . '1';
 }
 
+/**
+ * Test class for the apply test
+ */
 class FilterTestClass
 {
   public function filter($content)

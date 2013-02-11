@@ -2,7 +2,7 @@
 /**
  * CallbackFactory.php
  *
- * @package Gustavus\Extensibility
+ * @package Extensibility
  *
  * @author Joe Lencioni
  * @author Chris Rog
@@ -21,7 +21,7 @@ use \InvalidArgumentException;
  * $callback = CallbackFactory::getCallback('myFunction');
  * </code>
  *
- * @package Gustavus\Extensibility
+ * @package Extensibility
  *
  * @author Joe Lencioni
  * @author Chris Rog
@@ -108,7 +108,7 @@ abstract class CallbackFactory
 
     if (!isset($wrapper)) {
       $wrapper = new Callback($callback, $paramCount);
-      array_push(self::$cache[$hashcode], ['key'=>$callback, 'value'=>$wrapper]);
+      array_push(self::$cache[$hashcode], ['key' => $callback, 'value' => $wrapper]);
     }
 
     return $wrapper;

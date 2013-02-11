@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Gustavus\Extensibility
+ * @package Extensibility
  *
  * @author  Joe Lencioni
  * @author  Billy Visto
@@ -17,7 +17,7 @@ use \ReflectionFunction,
 /**
  * Callbacks used by Filters and Actions
  *
- * @package Gustavus\Extensibility
+ * @package Extensibility
  *
  * @author  Joe Lencioni
  * @author  Billy Visto
@@ -122,5 +122,4 @@ class Callback
     return call_user_func_array($this->callback, $arguments);
   }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
 }

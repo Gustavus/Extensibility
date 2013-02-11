@@ -46,6 +46,9 @@ class CallbackFactoryTest extends \Gustavus\Test\Test
     }
   }
 
+  /**
+   * Data provider for testGetCallback
+   */
   public function dataForGetCallback()
   {
     $foo = new Foo();
@@ -105,11 +108,13 @@ class CallbackFactoryTest extends \Gustavus\Test\Test
 
 class Foo
 {
-  public function foo() {
+  public function foo()
+  {
     return;
   }
 
-  public static function bar() {
+  public static function bar()
+  {
     return;
   }
 }
