@@ -19,81 +19,62 @@ class CallbackFactoryTest extends \Gustavus\Test\Test
    */
   public function setUp()
   {
-    $this->set('\Gustavus\Extensibility\CallbackFactory', 'objectCallbackCache', null);
-    $this->set('\Gustavus\Extensibility\CallbackFactory', 'nonObjectCallbackCache', null);
+    $this->set('\Gustavus\Extensibility\CallbackFactory', 'cache', null);
   }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
    * @test
+   * @dataProvider dataForGetCallback
    */
-  public function isCallbackInObject()
+  public function testGetCallback($callback, $paramCount, $success)
   {
-    $this->assertFalse($this->call('\Gustavus\Extensibility\CallbackFactory', 'isCallbackInObject', array('is_int')));
+    try {
+      $callback = CallbackFactory::getCallback($callback, $paramCount);
 
-    $this->assertFalse($this->call('\Gustavus\Extensibility\CallbackFactory', 'isCallbackInObject', array(array('is_int'))));
+      $this->assertInstanceOf('\\Gustavus\\Extensibility\\Callback', $callback);
 
-    $this->assertFalse($this->call('\Gustavus\Extensibility\CallbackFactory', 'isCallbackInObject', array(array('\Gustavus\Extensibility\CallbackFactory', 'getCallback'))));
 
-    $foo = new Foo();
-    $this->assertTrue($this->call('\Gustavus\Extensibility\CallbackFactory', 'isCallbackInObject', array(array($foo, 'foo'))));
+      if (!$success) {
+        $this->fail('An expected exception was not thrown.');
+      }
+    } catch (\Exception $e) {
+      if ($success) {
+        throw $e;
+      }
+    }
   }
 
   /**
-   * @test
+   * Data provider for testGetCallback
    */
-  public function getCacheKeyFromSimpleFunctions()
-  {
-    $keyA = $this->call('\Gustavus\Extensibility\CallbackFactory', 'getCacheKey', array('is_int'));
-
-    $keyB = $this->call('\Gustavus\Extensibility\CallbackFactory', 'getCacheKey', array('is_string'));
-
-    $keyC = $this->call('\Gustavus\Extensibility\CallbackFactory', 'getCacheKey', array('is_int'));
-
-    $this->assertSame($keyA, $keyC);
-    $this->assertNotSame($keyA, $keyB);
-    $this->assertInternalType('string', $keyA);
-    $this->assertInternalType('string', $keyB);
-    $this->assertInternalType('string', $keyC);
-  }
-
-  /**
-   * @test
-   */
-  public function getCacheKeyFromDifferentInstancesOfSameClass()
-  {
-    $fooA = new Foo();
-    $fooB = new Foo();
-
-    $keyA = $this->call('\Gustavus\Extensibility\CallbackFactory', 'getCacheKey', array(array($fooA, 'foo')));
-
-    $keyB = $this->call('\Gustavus\Extensibility\CallbackFactory', 'getCacheKey', array(array($fooB, 'foo')));
-
-    $this->assertSame($keyA, $keyB);
-    $this->assertInternalType('string', $keyA);
-    $this->assertInternalType('string', $keyB);
-  }
-
-  /**
-   * @test
-   */
-  public function getCacheKeyFromDifferentClassesWithSameFunctionNames()
+  public function dataForGetCallback()
   {
     $foo = new Foo();
-    $bar = new Bar();
 
-    $keyA = $this->call('\Gustavus\Extensibility\CallbackFactory', 'getCacheKey', array(array($foo, 'foo')));
+    return [
+      ['is_string', 1, true],
+      [[$foo, 'foo'], 0, true],
+      [['\\Gustavus\\Extensibility\\Test\\Foo', 'bar'], null, true],
+      ['\\Gustavus\\Extensibility\\Test\\Foo::bar', null, true],
+      [function($party, $hard) { return; }, 2, true],
 
-    $keyB = $this->call('\Gustavus\Extensibility\CallbackFactory', 'getCacheKey', array(array($bar, 'foo')));
-
-    $this->assertSame($keyA, $keyB);
-    $this->assertInternalType('string', $keyA);
-    $this->assertInternalType('string', $keyB);
+      ['is_string', -1, false],
+      ['is_string', 'one', false],
+      ['is_string', 1.23, false],
+      ['is_string', true, false],
+      ['is_string', [1], false],
+      ['is_string', $foo, false]
+    ];
   }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
    * @test
    */
-  public function getCallbackWithSimpleFunctions()
+  public function testCallbackCaching()
   {
     $callbackA = CallbackFactory::getCallback('is_int');
     $callbackB = CallbackFactory::getCallback('is_string');
@@ -104,15 +85,11 @@ class CallbackFactoryTest extends \Gustavus\Test\Test
     $this->assertInstanceOf('\Gustavus\Extensibility\Callback', $callbackA);
     $this->assertInstanceOf('\Gustavus\Extensibility\Callback', $callbackB);
     $this->assertInstanceOf('\Gustavus\Extensibility\Callback', $callbackC);
-  }
 
-  /**
-   * @test
-   */
-  public function getCallbackWithFunctionsInClasses()
-  {
-    $fooA   = new Foo();
-    $fooB   = new Foo();
+
+
+    $fooA = new Foo();
+    $fooB = new Foo();
 
     $callbackA = CallbackFactory::getCallback(array($fooA, 'foo'));
     $callbackB = CallbackFactory::getCallback(array($fooB, 'foo'));
@@ -124,19 +101,10 @@ class CallbackFactoryTest extends \Gustavus\Test\Test
     $this->assertInstanceOf('\Gustavus\Extensibility\Callback', $callbackB);
     $this->assertInstanceOf('\Gustavus\Extensibility\Callback', $callbackC);
   }
-
-  /**
-   * @test
-   */
-  public function classesForTests()
-  {
-    $foo = new Foo();
-    $this->assertNULL($foo->foo());
-
-    $bar = new Bar();
-    $this->assertNULL($bar->foo());
-  }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Foo
 {
@@ -144,11 +112,8 @@ class Foo
   {
     return;
   }
-}
 
-class Bar
-{
-  public function foo()
+  public static function bar()
   {
     return;
   }

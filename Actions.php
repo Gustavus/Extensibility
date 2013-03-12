@@ -25,21 +25,19 @@ class Actions extends Base
     if ($iterator = self::getIterator($tag)) {
       foreach ($iterator as $callbacks) {
         foreach ($callbacks as $callback) {
-          if ($callback->isCallable()) {
-            $arguments  = func_get_args();
-            $arguments  = array_slice($arguments, 1);
+          $arguments  = func_get_args();
+          $arguments  = array_slice($arguments, 1);
 
-            if ($callback->getNumberOfParameters() === 0) {
-              $arguments  = array();
-            } else if ($callback->getNumberOfParameters() < count($arguments)) {
-              $arguments  = array_slice($arguments, 0, $callback->getNumberOfParameters());
-            }
+          if ($callback->getNumberOfParameters() === 0) {
+            $arguments  = array();
+          } else if ($callback->getNumberOfParameters() < count($arguments)) {
+            $arguments  = array_slice($arguments, 0, $callback->getNumberOfParameters());
+          }
 
-            $callback->execute($arguments);
+          $callback->execute($arguments);
 
-            if (self::isStopRequested()) {
-              return self::endApply();
-            }
+          if (self::isStopRequested()) {
+            return self::endApply();
           }
         }
       }

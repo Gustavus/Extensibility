@@ -1,25 +1,37 @@
 <?php
 /**
  * @package Extensibility
+ *
  * @author  Joe Lencioni
  * @author  Billy Visto
+ * @author  Chris Rog
  */
 
 namespace Gustavus\Extensibility;
+
+use \ReflectionFunction,
+    \ReflectionMethod;
+
+
 
 /**
  * Callbacks used by Filters and Actions
  *
  * @package Extensibility
+ *
  * @author  Joe Lencioni
  * @author  Billy Visto
+ * @author  Chris Rog
  */
 class Callback
 {
   /**
-   * @var mixed callback
+   * The callback we'll be using. This MUST be of the pseudo-type "callable," or a number of things
+   * will break in pretty catastrophic ways.
+   *
+   * @var callable
    */
-  private $function;
+  private $callback;
 
   /**
    * @var integer Number of parameters the callback function takes
@@ -31,39 +43,34 @@ class Callback
    */
   private $reflection;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
   /**
-   * This function should only be constructed by the Callback factory. If you want to use this object, use CallbackFactory::getCallback(...) instead.
+   * This function should only be constructed by the Callback factory. If you want to use this
+   * object, use CallbackFactory::getCallback(...) instead.
    *
-   * @param mixed $function callback
+   * @param callable $callback callback
    * @param integer $numberOfParameters
    * @return void
    */
-  public function __construct($function, $numberOfParameters = null)
+  public function __construct(callable $callback, $numberOfParameters = null)
   {
-    $this->function           = $function;
+    $this->callback           = $callback;
     $this->numberOfParameters = $numberOfParameters;
   }
 
-  /**
-   * @return void
-   */
-  public function __destruct()
-  {
-    unset($this->function);
-    unset($this->numberOfParameters);
-    unset($this->reflection);
-  }
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @return object \ReflectionMethod or \ReflectionFunction
+   * @return object ReflectionMethod or ReflectionFunction
    */
   private function getReflection()
   {
-    if ($this->reflection === null) {
-      if ($this->isMethod()) {
-        $this->reflection = new \ReflectionMethod($this->function[0], $this->function[1]);
-      } else if ($this->isFunction()) {
-        $this->reflection = new \ReflectionFunction($this->function);
+    if (!isset($this->reflection)) {
+      if (is_array($this->callback)) {
+        $this->reflection = new ReflectionMethod($this->callback[0], $this->callback[1]);
+      } else {
+        $this->reflection = new ReflectionFunction($this->callback);
       }
     }
 
@@ -71,13 +78,13 @@ class Callback
   }
 
   /**
-   * Gets the number of parameters that this callback function accepts.
+   * Gets the number of parameters that this callback accepts.
    *
    * @return integer
    */
   public function getNumberOfParameters()
   {
-    if ($this->numberOfParameters === null) {
+    if (!isset($this->numberOfParameters)) {
       $this->numberOfParameters = $this->getReflection()->getNumberOfParameters();
     }
 
@@ -85,46 +92,23 @@ class Callback
   }
 
   /**
-   * Determines if this callback can be called.
-   *
-   * @return boolean
-   */
-  public function isCallable()
-  {
-    return is_callable($this->function);
-  }
-
-  /**
-   * Determines if this callback is a method on an object.
+   * Determines if this callback is a method.
    *
    * @return boolean
    */
   private function isMethod()
   {
-    return is_array($this->function);
+    return is_array($this->callback) && is_object($this->callback[0]);
   }
 
   /**
-   * Determines if this callback is a standard function (not an object's method).
+   * Determines if this callback is a global, class or anonymous function.
    *
    * @return boolean
    */
   private function isFunction()
   {
-    return is_string($this->function);
-  }
-
-  /**
-   * Checks to see if the function is a method on an object
-   *
-   * @return boolean
-   */
-  private function isMethodOnObject()
-  {
-    if (is_array($this->function) && is_object($this->function[0])) {
-      return true;
-    }
-    return false;
+    return !$this->isMethod();
   }
 
   /**
@@ -133,16 +117,9 @@ class Callback
    * @param array $arguments
    * @return mixed
    */
-  public function execute(array $arguments = array())
+  public function execute(array $arguments = [])
   {
-    if ($this->isMethod()) {
-      if ($this->isMethodOnObject()) {
-        return $this->getReflection()->invokeArgs($this->function[0], $arguments);
-      } else {
-        return call_user_func_array($this->function, $arguments);
-      }
-    } else {
-      return $this->getReflection()->invokeArgs($arguments);
-    }
+    return call_user_func_array($this->callback, $arguments);
   }
+
 }

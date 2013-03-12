@@ -45,7 +45,7 @@ class CallbackTest extends \Gustavus\Test\Test
    */
   public function testPrivateMethod()
   {
-    $this->assertNULL($this->privateMethod());
+    $this->assertNull($this->privateMethod());
   }
 
   /**
@@ -63,6 +63,9 @@ class CallbackTest extends \Gustavus\Test\Test
 
     $callback = new Callback(array('Gustavus\Extensibility\Test\CallbackTest', 'staticCallbackFunction'));
     $this->assertSame('tsraarst', $callback->execute(array('tsra')));
+
+    $callback = new Callback(function() { return true; });
+    $this->assertSame(true, $callback->execute());
   }
 
   /**
@@ -82,7 +85,7 @@ class CallbackTest extends \Gustavus\Test\Test
 
   /**
    * @test
-   */
+   *
   public function isCallable()
   {
     $callback = new Callback('is_int');
@@ -97,4 +100,5 @@ class CallbackTest extends \Gustavus\Test\Test
     $callback = new Callback(array('Gustavus\Extensibility\Test\CallbackTest', 'staticCallbackFunction'));
     $this->assertTrue($callback->isCallable());
   }
+   */
 }

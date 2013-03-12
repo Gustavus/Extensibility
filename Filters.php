@@ -35,21 +35,19 @@ class Filters extends Base
     if ($iterator = self::getIterator($tag)) {
       foreach ($iterator as $callbacks) {
         foreach ($callbacks as $callback) {
-          if ($callback->isCallable()) {
-            $arguments  = func_get_args();
-            $arguments  = array_merge(array($content), array_slice($arguments, 2));
+          $arguments  = func_get_args();
+          $arguments  = array_merge(array($content), array_slice($arguments, 2));
 
-            if ($callback->getNumberOfParameters() === 0) {
-              $arguments  = array();
-            } else if ($callback->getNumberOfParameters() < count($arguments)) {
-              $arguments  = array_slice($arguments, 0, $callback->getNumberOfParameters());
-            }
+          if ($callback->getNumberOfParameters() === 0) {
+            $arguments  = array();
+          } else if ($callback->getNumberOfParameters() < count($arguments)) {
+            $arguments  = array_slice($arguments, 0, $callback->getNumberOfParameters());
+          }
 
-            $content  = $callback->execute($arguments);
+          $content  = $callback->execute($arguments);
 
-            if (self::isStopRequested()) {
-              return self::endApply($content);
-            }
+          if (self::isStopRequested()) {
+            return self::endApply($content);
           }
         }
       }
