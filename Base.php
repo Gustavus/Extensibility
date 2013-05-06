@@ -154,4 +154,15 @@ abstract class Base
   {
     self::$currentTag = $tag;
   }
+
+  /**
+   * Clears the specified tag of callbacks
+   *
+   * @param  string $tag Tag to clear
+   * @return void
+   */
+  final static public function clear($tag)
+  {
+    unset(self::$items[$tag]);
+  }
 }
