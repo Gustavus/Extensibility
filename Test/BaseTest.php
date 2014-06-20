@@ -220,4 +220,15 @@ class BaseTest extends Base
     $this->assertSame('TestTag', $this->get('\Gustavus\Extensibility\Base', 'currentTag'));
   }
 
+  /**
+   * @test
+   */
+  public function exists()
+  {
+    $this->assertFalse(\Gustavus\Extensibility\Base::exists('Testing'));
+
+    \Gustavus\Extensibility\Base::add('Testing', 'is_int');
+
+    $this->assertTrue(\Gustavus\Extensibility\Base::exists('Testing'));
+  }
 }

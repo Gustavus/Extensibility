@@ -40,7 +40,7 @@ abstract class Base
    *
    * @param string $tag
    * @param callback $function
-   * @param integer $priority
+   * @param integer $priority Lower numbers are ran first
    * @param integer $numberOfParameters
    * @return boolean
    */
@@ -164,5 +164,16 @@ abstract class Base
   final static public function clear($tag)
   {
     unset(self::$items[$tag]);
+  }
+
+  /**
+   * Checks to see if the specified filter exists or not
+   *
+   * @param  string $tag Tag to check existence for
+   * @return boolean
+   */
+  final static public function exists($tag)
+  {
+    return isset(self::$items[$tag]);
   }
 }
